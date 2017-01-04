@@ -1,0 +1,5 @@
+{
+  "PrivateKeyPath": "./settings/keys/jwt-private.pem",
+  "PublicKeyPath": "./settings/keys/jwt-public.pem",
+  "JWTExpirationDelta": 4
+}

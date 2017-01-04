@@ -1,0 +1,11 @@
+{
+  "DebugMode": true,
+  "PrivateKeyPath": "./settings/keys/jwt-private-dev.pem",
+  "PublicKeyPath": "./settings/keys/jwt-public-dev.pem",
+  "JWTExpirationDelta": 72,
+  "MongoAddrs": ["172.17.0.3:27017"],
+	"MongoTimeout": 60,
+	"MongoDatabase": "hapi-app",
+	"MongoUsername": "",
+	"MongoPassword": ""
+}
