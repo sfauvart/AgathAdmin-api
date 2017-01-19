@@ -1,15 +1,18 @@
 package dao
 
-import(
-  "errors"
+import (
+	"errors"
 )
+
 const (
 	// DAOMongo is used for Mongo implementation of UserDAO
 	DAOMongo int = iota
 	// DAOMock is used for mocked implementation of UserDAO
 	DAOMock
 
-  NoPaging = -1
+	NoPaging               = -1
+	MaxElementsPerPage     = 100
+	DefaultElementsPerPage = 10
 )
 
 var (

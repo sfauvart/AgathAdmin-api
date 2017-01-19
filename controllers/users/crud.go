@@ -1,50 +1,88 @@
 package users
 
 import (
-	"net/http"
+	logger "github.com/Sirupsen/logrus"
 	"github.com/sfauvart/Agathadmin-api/dao"
-  "github.com/sfauvart/Agathadmin-api/helpers"
+	"github.com/sfauvart/Agathadmin-api/helpers"
 	"github.com/sfauvart/Agathadmin-api/models"
+	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/mgo.v2"
-  logger "github.com/Sirupsen/logrus"
-  "strconv"
+	"math"
+	"net/http"
+	"strconv"
 )
 
 func GetAll(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-  startStr := helpers.ParamAsString("start", r)
-	endStr := helpers.ParamAsString("end", r)
+	pageStr := r.URL.Query().Get("page")
+	sizeStr := r.URL.Query().Get("size")
+	sortStr := r.URL.Query().Get("sort")
 
-	start := dao.NoPaging
-	end := dao.NoPaging
+	page := 1
+	size := dao.DefaultElementsPerPage
 	var err error
-	if startStr != "" && endStr != "" {
-		start, err = strconv.Atoi(startStr)
-		if err != nil {
-			start = dao.NoPaging
-		}
-		end, err = strconv.Atoi(endStr)
-		if err != nil {
-			end = dao.NoPaging
-		}
+	if pageStr != "" {
+		page, err = strconv.Atoi(pageStr)
+	}
+	if sizeStr != "" {
+		size, err = strconv.Atoi(sizeStr)
+	}
+	if size > dao.MaxElementsPerPage {
+		size = dao.MaxElementsPerPage
 	}
 
-  userDao, err := dao.GetUserDAO(dao.DAOMongo)
+	start := (page - 1) * size
+	end := (page * size)
+
+	if sortStr == "" {
+		sortStr = "+id"
+	}
+
+	userDao, err := dao.GetUserDAO(dao.DAOMongo)
 	if err != nil {
 		logger.WithField("error", err).Fatal("unable to connect to mongo db")
-		w.WriteHeader(500)
+		helpers.SendJSONError(w, "Error while retrieving users", http.StatusInternalServerError)
 		return
 	}
 
 	// Fetch users
-	users, err := userDao.GetAll(start, end)
-  if err != nil {
+	users, te, err := userDao.GetAll(start, end, sortStr)
+	if err != nil {
 		logger.WithField("error", err).Warn("unable to retrieve users")
 		helpers.SendJSONError(w, "Error while retrieving users", http.StatusInternalServerError)
 		return
 	}
 
+	pagination := helpers.Pagination{
+		CurrentPage:      page,
+		TotalPages:       int(math.Ceil(float64(te) / float64(size))),
+		NumberOfElements: len(users.([]models.User)),
+		TotalElements:    te,
+		FirstPage:        true,
+		LastPage:         true,
+	}
+	sort := helpers.Sort{
+		Ascending: true,
+		Property:  sortStr[1:],
+	}
+	sortStrDir := sortStr[:1]
+	if sortStrDir == "-" {
+		sort.Ascending = false
+	}
+	if page > 1 {
+		pagination.FirstPage = false
+	}
+	if page*size < te {
+		pagination.LastPage = false
+	}
+
+	json := helpers.PaginatedResult{
+		Pagination: pagination,
+		Sort:       sort,
+		Data:       users,
+	}
+
 	logger.WithField("users", users).Debug("users found")
-	helpers.SendJSONOk(w, users)
+	helpers.SendJSONOk(w, json)
 }
 
 // Get retrieve an entity by id
@@ -96,6 +134,14 @@ func Create(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 		helpers.SendJSONError(w, "Error while creating user", http.StatusInternalServerError)
 		return
 	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		logger.WithField("error", err).Fatal("unable to generate hash password")
+		helpers.SendJSONError(w, "Error while generate hash password", http.StatusInternalServerError)
+		return
+	}
+	user.Password = string(hashedPassword[:])
 
 	// save user
 	err = userDao.Save(user)

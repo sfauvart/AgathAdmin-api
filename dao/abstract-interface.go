@@ -7,7 +7,7 @@ type BaseDAO interface {
 	GetByID(ID string) (interface{}, error)
 
 	// GetAllUsers returns all users with paging capability
-	GetAll(start, end int) (interface{}, error)
+	GetAll(start, end int, sort string) (interface{}, int, error)
 
 	// SaveUser saves the user
 	Save(model interface{}) error
@@ -20,5 +20,5 @@ type BaseDAO interface {
 }
 
 type AbstractDAO interface {
-  BaseDAO
+	BaseDAO
 }

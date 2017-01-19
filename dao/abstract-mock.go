@@ -1,23 +1,24 @@
 package dao
 
 import (
-  "github.com/sfauvart/Agathadmin-api/models"
-	"gopkg.in/mgo.v2/bson"
 	logger "github.com/Sirupsen/logrus"
+	"github.com/sfauvart/Agathadmin-api/models"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // MockedAbstract is the abstract returned by this mocked interface
 var MockedAbstract = models.Abstract{
-  Id:     bson.NewObjectId(),
+	Id: bson.NewObjectId(),
 }
 
 // AbstractDAOMock is the mocked implementation of the AbstractDAO
 type BaseDAOMock interface {
 	GetModel() interface{}
 }
+
 // AbstractDAOMongo is the mongo implementation of the UserDAO
 type AbstractDAOMock struct {
-	model			 interface{}
+	model interface{}
 }
 
 func (a *AbstractDAOMock) GetModel() interface{} {
@@ -26,7 +27,7 @@ func (a *AbstractDAOMock) GetModel() interface{} {
 
 // NewAbstractDAOMock creates a new AbstractDAO with a mocked implementation
 func NewAbstractDAOMock(s *AbstractDAOMock) BaseDAO {
-  if s.model == nil {
+	if s.model == nil {
 		logger.WithField("error", s.model).Warn("no model defined !")
 	}
 	return s
@@ -38,8 +39,8 @@ func (s *AbstractDAOMock) GetByID(ID string) (interface{}, error) {
 }
 
 // GetAllUsers returns all users with paging capability
-func (s *AbstractDAOMock) GetAll(start, end int) (interface{}, error) {
-	return []models.Abstract{MockedAbstract}, nil
+func (s *AbstractDAOMock) GetAll(start, end int, sort string) (interface{}, int, error) {
+	return []models.Abstract{MockedAbstract}, 1, nil
 }
 
 // SaveUser saves the user

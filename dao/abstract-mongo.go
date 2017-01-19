@@ -2,10 +2,11 @@ package dao
 
 import (
 	"errors"
-	"reflect"
 	logger "github.com/Sirupsen/logrus"
+	"github.com/sfauvart/Agathadmin-api/models"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"reflect"
 )
 
 type BaseDAOMongo interface {
@@ -14,12 +15,13 @@ type BaseDAOMongo interface {
 	GetIndex() []string
 	GetModel() interface{}
 }
+
 // AbstractDAOMongo is the mongo implementation of the UserDAO
 type AbstractDAOMongo struct {
-	session *mgo.Session
+	session    *mgo.Session
 	collection string
 	index      []string
-	model			 interface{}
+	model      interface{}
 }
 
 func (a *AbstractDAOMongo) GetSession() *mgo.Session {
@@ -70,7 +72,7 @@ func (s *AbstractDAOMongo) GetByID(ID string) (interface{}, error) {
 }
 
 // getAllUsersByQuery returns users by query and paging capability
-func (s *AbstractDAOMongo) getAllByQuery(query interface{}, start, end int) (interface{}, error) {
+func (s *AbstractDAOMongo) getAllByQuery(query interface{}, start, end int, sort string) (interface{}, int, error) {
 	session := s.session.Copy()
 	defer session.Close()
 	c := session.DB("").C(s.collection)
@@ -85,18 +87,19 @@ func (s *AbstractDAOMongo) getAllByQuery(query interface{}, start, end int) (int
 	x := reflect.New(slice.Type())
 	x.Elem().Set(slice)
 
+	te, err := c.Find(query).Count()
 	if hasPaging {
-		err = c.Find(query).Skip(start).Limit(end - start).All(x.Interface())
+		err = c.Find(query).Skip(start).Limit(end - start).Sort(sort).All(x.Interface())
 	} else {
-		err = c.Find(query).All(x.Interface())
+		err = c.Find(query).Sort(sort).All(x.Interface())
 	}
 
-	return x.Interface(), err
+	return x.Elem().Interface(), te, err
 }
 
 // GetAllUsers returns all users with paging capability
-func (s *AbstractDAOMongo) GetAll(start, end int) (interface{}, error) {
-	return s.getAllByQuery(nil, start, end)
+func (s *AbstractDAOMongo) GetAll(start, end int, sort string) (interface{}, int, error) {
+	return s.getAllByQuery(nil, start, end, sort)
 }
 
 // SaveUser saves the user
@@ -110,15 +113,21 @@ func (s *AbstractDAOMongo) Save(model interface{}) error {
 // UpsertUser updates or creates a user
 func (s *AbstractDAOMongo) UpsertByID(ID string, model interface{}) (bool, error) {
 
+	var oi bson.ObjectId = ""
 	// check ID
-	if !bson.IsObjectIdHex(ID) {
-		return false, errors.New("Invalid input to ObjectIdHex")
+	if ID != "" {
+		if !bson.IsObjectIdHex(ID) {
+			return false, errors.New("Invalid input to ObjectIdHex")
+		}
+		oi = bson.ObjectIdHex(ID)
+	} else {
+		oi = model.(models.Base).GetId()
 	}
 
 	session := s.session.Copy()
 	defer session.Close()
 	c := session.DB("").C(s.collection)
-	chg, err := c.Upsert(bson.M{"_id": bson.ObjectIdHex(ID)}, model)
+	chg, err := c.UpsertId(oi, model)
 	if err != nil {
 		return false, err
 	}

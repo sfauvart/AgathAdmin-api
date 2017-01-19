@@ -8,9 +8,9 @@ import (
 	"os"
 	"time"
 
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/sfauvart/Agathadmin-api/models"
 	"github.com/sfauvart/Agathadmin-api/settings"
-	jwt "github.com/dgrijalva/jwt-go"
 )
 
 type JWTAuthenticationBackend struct {
@@ -23,15 +23,15 @@ type TokenAuthentication struct {
 }
 
 type UserClaims struct {
-	FirstName string        `json:"first_name"`
-	LastName  string        `json:"last_name"`
-	Email     string        `json:"email"`
-	Roles []string `json:"roles"`
+	FirstName string   `json:"first_name"`
+	LastName  string   `json:"last_name"`
+	Email     string   `json:"email"`
+	Roles     []string `json:"roles"`
 }
 
 type CustomClaims struct {
-    jwt.StandardClaims
-		User UserClaims `json:"user"`
+	jwt.StandardClaims
+	User UserClaims `json:"user"`
 }
 
 const (
@@ -55,15 +55,15 @@ func InitJWTAuthenticationBackend() *JWTAuthenticationBackend {
 func (backend *JWTAuthenticationBackend) GenerateToken(user models.User) (string, error) {
 	claims := CustomClaims{
 		User: UserClaims{
-			Roles: user.Roles,
+			Roles:     user.Roles,
 			FirstName: user.FirstName,
-			LastName: user.LastName,
-			Email: user.Email,
+			LastName:  user.LastName,
+			Email:     user.Email,
 		},
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * time.Duration(settings.Get().JWTExpirationDelta)).Unix(),
-			IssuedAt: time.Now().Unix(),
-			Subject: user.Id.Hex(),
+			IssuedAt:  time.Now().Unix(),
+			Subject:   user.Id.Hex(),
 		},
 	}
 
@@ -91,6 +91,7 @@ func (backend *JWTAuthenticationBackend) RefreshToken(token jwt.Token) (string, 
 	}
 	return tokenString, nil
 }
+
 /*
 func (backend *JWTAuthenticationBackend) Authenticate(user *models.User) bool {
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("testing"), 10)
@@ -114,6 +115,7 @@ func (backend *JWTAuthenticationBackend) getTokenRemainingValidity(timestamp int
 	}
 	return expireOffset
 }
+
 /*
 func (backend *JWTAuthenticationBackend) Logout(tokenString string, token *jwt.Token) error {
 	redisConn := redis.Connect()

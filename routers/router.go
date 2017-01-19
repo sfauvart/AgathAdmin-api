@@ -1,18 +1,18 @@
 package routers
 
 import (
+	logger "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
+	middleJwt "github.com/sfauvart/Agathadmin-api/middlewares/jwt"
 	"github.com/sfauvart/Agathadmin-api/routers/api"
 	"github.com/sfauvart/Agathadmin-api/routers/structs"
-	middleJwt "github.com/sfauvart/Agathadmin-api/middlewares/jwt"
 	"github.com/urfave/negroni"
-	logger "github.com/Sirupsen/logrus"
 )
 
 func InitRoutes() *mux.Router {
 	muxRouter := mux.NewRouter().StrictSlash(false)
 
-	allRoutes := []*structs.Routes{ NewAuthRoutes(), api.NewUsersRoutes() }
+	allRoutes := []*structs.Routes{NewAuthRoutes(), api.NewUsersRoutes()}
 
 	for _, routes := range allRoutes {
 		for _, route := range routes.Routes {
@@ -25,7 +25,7 @@ func InitRoutes() *mux.Router {
 			}
 			_n.Use(negroni.HandlerFunc(route.HandlerFunc))
 
-			muxRouter.Handle(routes.Prefix + route.Pattern, _n).Methods(route.Method).Name(route.Name)
+			muxRouter.Handle(routes.Prefix+route.Pattern, _n).Methods(route.Method).Name(route.Name)
 		}
 	}
 

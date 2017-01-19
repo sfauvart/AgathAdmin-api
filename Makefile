@@ -6,6 +6,8 @@ TAG := latest
 
 HOST ?= $(shell uname)
 CPU ?= $(shell uname -m)
+# list of pkgs for the project without vendor
+PKGS=$(shell go list ./... | grep -v /vendor/)
 
 # if no host is identifed (no uname tool)
 # we assume a Linux-64bit build
@@ -79,6 +81,9 @@ build:
 # Builds & run the project
 run:
 	go run ${LDFLAGS} server.go
+
+format:
+	@go fmt $(PKGS)
 
 # Installs our project: copies binaries
 install:

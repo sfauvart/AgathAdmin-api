@@ -1,13 +1,13 @@
 package main
 
 import (
+	"fmt"
+	"github.com/rs/cors"
 	"github.com/sfauvart/Agathadmin-api/routers"
 	"github.com/sfauvart/Agathadmin-api/settings"
 	"github.com/urfave/negroni"
-	"github.com/rs/cors"
-	"net/http"
 	"log"
-	"fmt"
+	"net/http"
 )
 
 // Variables to identiy the build
@@ -25,11 +25,11 @@ func main() {
 	n := negroni.Classic()
 
 	c := cors.New(cors.Options{
-		AllowedOrigins: []string{"*"},
+		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
-		AllowedHeaders: []string{"Authorization", "Content-Type"},
-		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
-		Debug: settings.Get().DebugMode,
+		AllowedHeaders:   []string{"Authorization", "Content-Type"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
+		Debug:            settings.Get().DebugMode,
 	})
 
 	n.Use(c)

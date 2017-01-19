@@ -1,7 +1,7 @@
 package dao
 
 import (
-  "github.com/sfauvart/Agathadmin-api/settings"
+	"github.com/sfauvart/Agathadmin-api/settings"
 )
 
 // GetUserDAO returns a UserDAO according to type and params

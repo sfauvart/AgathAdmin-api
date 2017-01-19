@@ -17,6 +17,40 @@ const (
 	errorMsg         = "Error"
 )
 
+type ErrorData struct {
+	Status int    `json:"status"`
+	Code   string `json:"code"`
+	Detail string `json:"detail"`
+}
+
+type Error struct {
+	ErrorData ErrorData `json:"error"`
+}
+
+type ErrorsResponse struct {
+	Errors []Error `json:"errors"`
+}
+
+type Pagination struct {
+	CurrentPage      int  `json:"currentPage"`
+	TotalPages       int  `json:"totalPages"`
+	NumberOfElements int  `json:"numberOfElements"`
+	TotalElements    int  `json:"totalElements"`
+	FirstPage        bool `json:"firstPage"`
+	LastPage         bool `json:"lastPage"`
+}
+
+type Sort struct {
+	Ascending bool   `json:"ascending"`
+	Property  string `json:"property"`
+}
+
+type PaginatedResult struct {
+	Data       interface{} `json:"data"`
+	Pagination Pagination  `json:"pagination"`
+	Sort       Sort        `json:"sort"`
+}
+
 // SendJSONWithHTTPCode outputs JSON with an HTTP code
 func SendJSONWithHTTPCode(w http.ResponseWriter, d interface{}, code int) {
 	w.Header().Set(ResponseHeaderContentTypeKey, ResponseHeaderContentTypeJSONUTF8)

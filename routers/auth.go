@@ -1,7 +1,7 @@
 package routers
 
 import (
-  "github.com/sfauvart/Agathadmin-api/controllers/auth"
+	"github.com/sfauvart/Agathadmin-api/controllers/auth"
 	"github.com/sfauvart/Agathadmin-api/routers/structs"
 	"net/http"
 )
@@ -13,7 +13,7 @@ const (
 // NewSpiritHandler creates a new spirit handler to manage spirits
 func NewAuthRoutes() *structs.Routes {
 	authRoutes := structs.Routes{
-		Prefix:    prefix,
+		Prefix: prefix,
 	}
 
 	// build routes
@@ -24,7 +24,7 @@ func NewAuthRoutes() *structs.Routes {
 		Method:      http.MethodPost,
 		Pattern:     "/signin",
 		HandlerFunc: auth.SignInController,
-    Auth:      false,
+		Auth:        false,
 	})
 	// Refresh Token
 	routes = append(routes, structs.Route{
@@ -32,7 +32,7 @@ func NewAuthRoutes() *structs.Routes {
 		Method:      http.MethodPost,
 		Pattern:     "/check",
 		HandlerFunc: auth.RefreshTokenController,
-    Auth:      false,
+		Auth:        false,
 	})
 
 	authRoutes.Routes = routes

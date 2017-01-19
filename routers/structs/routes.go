@@ -10,12 +10,12 @@ type Route struct {
 	Method      string
 	Pattern     string
 	HandlerFunc negroni.HandlerFunc
-	Auth			  bool
-	Roles			  []string
+	Auth        bool
+	Roles       []string
 }
 
 // SpiritHandler is a handler of spirits
 type Routes struct {
-	Routes    []Route
-	Prefix    string
+	Routes []Route
+	Prefix string
 }

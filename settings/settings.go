@@ -3,10 +3,10 @@ package settings
 import (
 	"encoding/json"
 	"fmt"
+	"gopkg.in/mgo.v2"
 	"io/ioutil"
 	"os"
-	"gopkg.in/mgo.v2"
-  "time"
+	"time"
 )
 
 var environments = map[string]string{
@@ -16,15 +16,15 @@ var environments = map[string]string{
 }
 
 type Settings struct {
-	DebugMode	bool
+	DebugMode          bool
 	PrivateKeyPath     string
 	PublicKeyPath      string
 	JWTExpirationDelta int
-	MongoAddrs []string
-	MongoTimeout int
-	MongoDatabase string
-	MongoUsername string
-	MongoPassword string
+	MongoAddrs         []string
+	MongoTimeout       int
+	MongoDatabase      string
+	MongoUsername      string
+	MongoPassword      string
 }
 
 var settings Settings = Settings{}
@@ -74,14 +74,14 @@ func GetMongoSession() *mgo.Session {
 		Username: Get().MongoUsername,
 		Password: Get().MongoPassword,
 	}
-	    // Connect to our local mongo
+	// Connect to our local mongo
 	mgoSession, err := mgo.DialWithInfo(mongoDBDialInfo)
 	// Check if connection error, is mongo running?
 	if err != nil {
-	    panic(err)
+		panic(err)
 	}
 
 	mgoSession.SetMode(mgo.Monotonic, true)
 
-  return mgoSession
+	return mgoSession
 }

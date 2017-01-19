@@ -1,8 +1,8 @@
 package api
 
 import (
-  "github.com/sfauvart/Agathadmin-api/routers/structs"
-  "github.com/sfauvart/Agathadmin-api/controllers/users"
+	"github.com/sfauvart/Agathadmin-api/controllers/users"
+	"github.com/sfauvart/Agathadmin-api/routers/structs"
 	"net/http"
 )
 
@@ -12,7 +12,7 @@ const (
 
 func NewUsersRoutes() *structs.Routes {
 	authRoutes := structs.Routes{
-		Prefix:    prefix,
+		Prefix: prefix,
 	}
 
 	// build routes
@@ -23,17 +23,17 @@ func NewUsersRoutes() *structs.Routes {
 		Method:      http.MethodGet,
 		Pattern:     "",
 		HandlerFunc: users.GetAll,
-    Auth:      true,
-    Roles:    []string{"ADMIN"},
+		Auth:        true,
+		Roles:       []string{"ADMIN"},
 	})
-  // Get
+	// Get
 	routes = append(routes, structs.Route{
 		Name:        "Get one user",
 		Method:      http.MethodGet,
 		Pattern:     "/{id}",
 		HandlerFunc: users.Get,
-    Auth:      true,
-    Roles:    []string{"ADMIN"},
+		Auth:        true,
+		Roles:       []string{"ADMIN"},
 	})
 	// Create
 	routes = append(routes, structs.Route{
@@ -41,8 +41,8 @@ func NewUsersRoutes() *structs.Routes {
 		Method:      http.MethodPost,
 		Pattern:     "",
 		HandlerFunc: users.Create,
-    Auth:      true,
-    Roles:    []string{"ADMIN"},
+		Auth:        true,
+		Roles:       []string{"ADMIN"},
 	})
 	// Update
 	routes = append(routes, structs.Route{
@@ -50,8 +50,8 @@ func NewUsersRoutes() *structs.Routes {
 		Method:      http.MethodPut,
 		Pattern:     "/{id}",
 		HandlerFunc: users.Update,
-    Auth:      true,
-    Roles:    []string{"ADMIN"},
+		Auth:        true,
+		Roles:       []string{"ADMIN"},
 	})
 	// Delete
 	routes = append(routes, structs.Route{
@@ -59,8 +59,8 @@ func NewUsersRoutes() *structs.Routes {
 		Method:      http.MethodDelete,
 		Pattern:     "/{id}",
 		HandlerFunc: users.Delete,
-    Auth:      true,
-    Roles:    []string{"ADMIN"},
+		Auth:        true,
+		Roles:       []string{"ADMIN"},
 	})
 
 	authRoutes.Routes = routes

@@ -5,6 +5,6 @@ import (
 )
 
 type UserDAO interface {
-  BaseDAO
-  GetByEmail(Email string) (*models.User, error)
+	BaseDAO
+	GetByEmail(Email string) (*models.User, error)
 }

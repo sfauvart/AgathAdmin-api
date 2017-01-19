@@ -1,17 +1,18 @@
 package auth
 
 import (
-	"net/http"
+	"encoding/json"
+	"gopkg.in/mgo.v2/bson"
+	logger "github.com/Sirupsen/logrus"
 	"github.com/sfauvart/Agathadmin-api/dao"
 	helperJwt "github.com/sfauvart/Agathadmin-api/helpers/jwt"
+	hJson "github.com/sfauvart/Agathadmin-api/helpers"
 	"golang.org/x/crypto/bcrypt"
-	"encoding/json"
-	"fmt"
-	logger "github.com/Sirupsen/logrus"
+	"net/http"
 )
 
 type SignInForm struct {
-	Email string `json:"email" form:"email"`
+	Email    string `json:"email" form:"email"`
 	Password string `json:"password" form:"password"`
 }
 
@@ -28,41 +29,35 @@ func SignInController(w http.ResponseWriter, r *http.Request, next http.HandlerF
 	userDao, err := dao.GetUserDAO(dao.DAOMongo)
 	if err != nil {
 		logger.WithField("error", err).Fatal("unable to connect to mongo db")
-		w.WriteHeader(500)
+		hJson.SendJSONError(w, "Error while retrieving users", http.StatusInternalServerError)
 		return
 	}
 
 	// Fetch user
 	u, err := userDao.GetByEmail(requestSignIn.Email)
 	if err != nil {
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(404)
-			return
+		hJson.SendJSONError(w, "Error while retrieving users", http.StatusNotFound)
+		return
 	}
 	user := *u
 	password := []byte(requestSignIn.Password)
-	tstPwd := bcrypt.CompareHashAndPassword([]byte(user.Password), password)
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), password)
+
+	if err != nil {
+		hJson.SendJSONError(w, "Error while retrieving users", http.StatusNotFound)
+		return
+	}
 
 	authBackend := helperJwt.InitJWTAuthenticationBackend()
 	token, err := authBackend.GenerateToken(user)
 	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(404)
+		hJson.SendJSONError(w, "Error while retrieving users", http.StatusNotFound)
 		return
 	} else {
-		response, _ := json.Marshal(helperJwt.TokenAuthentication{token})
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(200)
-		fmt.Fprintf(w, "%s", response)
+		now := bson.Now()
+		user.LastLogin = &now
+		_, err = userDao.UpsertByID("", user)
+		hJson.SendJSONOk(w, helperJwt.TokenAuthentication{token})
 		return
 	}
-
-	// Marshal provided interface into JSON structure
-	uj, _ := json.Marshal(u)
-
-	// Write content-type, statuscode, payload
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	fmt.Fprintf(w, "%s", uj)
-	fmt.Println(tstPwd)
 }

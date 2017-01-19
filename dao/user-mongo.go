@@ -13,12 +13,12 @@ type UserDAOMongo struct {
 
 // NewDAOMongo creates a new UserDAO mongo implementation
 func NewUserDAOMongo(session *mgo.Session) UserDAO {
-  userDaoMongo := UserDAOMongo{
+	userDaoMongo := UserDAOMongo{
 		&AbstractDAOMongo{
-			session: session,
+			session:    session,
 			collection: "users",
-			index: []string{"id", "email"},
-			model: models.User{},
+			index:      []string{"id", "email"},
+			model:      models.User{},
 		},
 	}
 	return &userDaoMongo
