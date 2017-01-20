@@ -233,7 +233,7 @@ func Delete(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 }
 
 type deleteAllForm struct {
-    Ids []string `json:"ids"`
+	Ids []string `json:"ids"`
 }
 
 func DeleteAll(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {

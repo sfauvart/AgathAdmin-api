@@ -7,5 +7,12 @@
 	"MongoTimeout": 60,
 	"MongoDatabase": "hapi-app",
 	"MongoUsername": "",
-	"MongoPassword": ""
+	"MongoPassword": "",
+  "SmtpHost": "127.0.0.1",
+  "SmtpPort": 1025,
+  "SmtpUser": "",
+  "SmtpPassword": "",
+  "NoReplyFrom": "noreply@example.com",
+  "BaseFrontUrl": "http://localhost:8080/",
+  "DefaultLocale": "fr"
 }

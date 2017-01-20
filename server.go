@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
+	logger "github.com/Sirupsen/logrus"
 	"github.com/rs/cors"
 	"github.com/sfauvart/Agathadmin-api/routers"
 	"github.com/sfauvart/Agathadmin-api/settings"
 	"github.com/urfave/negroni"
 	"log"
 	"net/http"
-	logger "github.com/Sirupsen/logrus"
 	"os"
 )
 
@@ -21,13 +21,13 @@ var (
 func main() {
 	fmt.Println("Webserver Version:", Version, "- Git commit hash:", Build)
 	// Log as JSON instead of the default ASCII formatter.
-  logger.SetFormatter(&logger.JSONFormatter{})
+	logger.SetFormatter(&logger.JSONFormatter{})
 
-  // Output to stdout instead of the default stderr, could also be a file.
-  logger.SetOutput(os.Stdout)
+	// Output to stdout instead of the default stderr, could also be a file.
+	logger.SetOutput(os.Stdout)
 
-  // Only log the warning severity or above.
-  logger.SetLevel(logger.WarnLevel)
+	// Only log the warning severity or above.
+	logger.SetLevel(logger.DebugLevel)
 
 	settings.Init()
 	router := routers.InitRoutes()

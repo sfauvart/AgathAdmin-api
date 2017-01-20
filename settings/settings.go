@@ -3,6 +3,7 @@ package settings
 import (
 	"encoding/json"
 	"fmt"
+	"gopkg.in/gomail.v2"
 	"gopkg.in/mgo.v2"
 	"io/ioutil"
 	"os"
@@ -25,6 +26,13 @@ type Settings struct {
 	MongoDatabase      string
 	MongoUsername      string
 	MongoPassword      string
+	SmtpHost           string
+	SmtpPort           int
+	SmtpUser           string
+	SmtpPassword       string
+	DefaultLocale      string
+	NoReplyFrom        string
+	BaseFrontUrl       string
 }
 
 var settings Settings = Settings{}
@@ -84,4 +92,8 @@ func GetMongoSession() *mgo.Session {
 	mgoSession.SetMode(mgo.Monotonic, true)
 
 	return mgoSession
+}
+
+func GetSmtpDial() *gomail.Dialer {
+	return gomail.NewDialer(Get().SmtpHost, Get().SmtpPort, Get().SmtpUser, Get().SmtpPassword)
 }

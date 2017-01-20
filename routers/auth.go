@@ -34,6 +34,22 @@ func NewAuthRoutes() *structs.Routes {
 		HandlerFunc: auth.RefreshTokenController,
 		Auth:        false,
 	})
+	// Forgot Password Token
+	routes = append(routes, structs.Route{
+		Name:        "Forgot Password token",
+		Method:      http.MethodPost,
+		Pattern:     "/forgot_password",
+		HandlerFunc: auth.ForgotPasswordController,
+		Auth:        false,
+	})
+	// Forgot Password Token
+	routes = append(routes, structs.Route{
+		Name:        "Forgot Password reset",
+		Method:      http.MethodPost,
+		Pattern:     "/forgot_password_confirm",
+		HandlerFunc: auth.ForgotPasswordConfirmController,
+		Auth:        false,
+	})
 
 	authRoutes.Routes = routes
 

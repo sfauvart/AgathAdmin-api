@@ -2,12 +2,12 @@ package auth
 
 import (
 	"encoding/json"
-	"gopkg.in/mgo.v2/bson"
 	logger "github.com/Sirupsen/logrus"
 	"github.com/sfauvart/Agathadmin-api/dao"
-	helperJwt "github.com/sfauvart/Agathadmin-api/helpers/jwt"
 	hJson "github.com/sfauvart/Agathadmin-api/helpers"
+	helperJwt "github.com/sfauvart/Agathadmin-api/helpers/jwt"
 	"golang.org/x/crypto/bcrypt"
+	"gopkg.in/mgo.v2/bson"
 	"net/http"
 )
 
