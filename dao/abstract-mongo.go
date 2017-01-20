@@ -67,8 +67,8 @@ func (s *AbstractDAOMongo) GetByID(ID string) (interface{}, error) {
 
 	m := reflect.New(reflect.TypeOf(s.GetModel()))
 	c := session.DB("").C(s.collection)
-	err := c.Find(bson.M{"_id": bson.ObjectIdHex(ID)}).One(&m)
-	return &m, err
+	err := c.Find(bson.M{"_id": bson.ObjectIdHex(ID)}).One(m.Interface())
+	return m.Elem().Interface(), err
 }
 
 // getAllUsersByQuery returns users by query and paging capability

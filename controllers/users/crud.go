@@ -178,6 +178,24 @@ func Update(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 		return
 	}
 
+	if user.Password != "" {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+		if err != nil {
+			logger.WithField("error", err).Fatal("unable to generate hash password")
+			helpers.SendJSONError(w, "Error while generate hash password", http.StatusInternalServerError)
+			return
+		}
+		user.Password = string(hashedPassword[:])
+	} else {
+		userOrigin, err := userDao.GetByID(userID)
+		if err != nil {
+			logger.WithField("error", err).WithField("user ID", userID).Warn("unable to retrieve user by ID")
+			helpers.SendJSONNotFound(w)
+			return
+		}
+		user.Password = userOrigin.(models.User).Password
+	}
+
 	// save user
 	_, err = userDao.UpsertByID(userID, user)
 	if err != nil {
@@ -212,4 +230,38 @@ func Delete(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 
 	logger.WithField("userID", userID).Debug("user deleted")
 	helpers.SendJSONOk(w, nil)
+}
+
+type deleteAllForm struct {
+    Ids []string `json:"ids"`
+}
+
+func DeleteAll(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	var f deleteAllForm
+	err := helpers.GetJSONContent(&f, r)
+	if err != nil {
+		logger.WithField("error", err).WithField("form", f).Warn("deleteAll error")
+		return
+	}
+
+	userDao, err := dao.GetUserDAO(dao.DAOMongo)
+	if err != nil {
+		logger.WithField("error", err).Fatal("unable to connect to mongo db")
+		helpers.SendJSONError(w, "Error while deleting user by ID", http.StatusInternalServerError)
+		return
+	}
+
+	var results deleteAllForm
+	for _, userID := range f.Ids {
+		err = userDao.DeleteByID(userID)
+		if err != nil {
+			logger.WithField("error", err).WithField("user ID", userID).Warn("unable to delete user by ID")
+		} else {
+			logger.WithField("userID", userID).Debug("user deleted")
+			results.Ids = append(results.Ids, userID)
+		}
+	}
+
+	helpers.SendJSONOk(w, results)
+	return
 }

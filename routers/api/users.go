@@ -63,6 +63,16 @@ func NewUsersRoutes() *structs.Routes {
 		Roles:       []string{"ADMIN"},
 	})
 
+	// DeleteAll
+	routes = append(routes, structs.Route{
+		Name:        "Delete All",
+		Method:      http.MethodDelete,
+		Pattern:     "",
+		HandlerFunc: users.DeleteAll,
+		Auth:        true,
+		Roles:       []string{"ADMIN"},
+	})
+
 	authRoutes.Routes = routes
 
 	return &authRoutes
